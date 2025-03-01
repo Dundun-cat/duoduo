@@ -286,23 +286,20 @@
             transform: translateX(-50%);
         }
         
-        /* 时间线样式 - 放大并优化水平布局 */
+        /* 时间线样式 - 自适应布局 */
         /* 时间轴容器 */
         .timeline-container {
             width: 100%;
             position: relative;
-            overflow: hidden;
             padding: 0 10px;
         }
         
         .timeline {
             position: relative;
             width: 95%;
-            max-width: 1500px;
             margin: 0 auto;
             padding-top: 20px;
             padding-bottom: 60px;
-            white-space: nowrap;
             text-align: center;
         }
         
@@ -310,11 +307,35 @@
             content: '';
             position: absolute;
             height: 1px;
-            width: 95%;
+            width: 100%;
             background: linear-gradient(135deg, #D693A1 0%, #E2F5FF 100%);
-            left: 2.5%;
+            left: 0;
             bottom: 30px;
-            top: auto;
+            display: none; /* 在小屏幕网格布局中隐藏 */
+        }
+        
+        /* 默认水平布局 */
+        .timeline {
+            white-space: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(214, 147, 161, 0.5) transparent;
+        }
+        
+        .timeline::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .timeline::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .timeline::-webkit-scrollbar-thumb {
+            background: rgba(214, 147, 161, 0.5);
+            border-radius: 10px;
         }
         
         .timeline-item {
@@ -425,6 +446,23 @@
         
         .timeline-content:hover img {
             transform: scale(1.02);
+        }
+        
+        /* 添加水平滚动指示器 */
+        .scroll-indicator {
+            text-align: center;
+            margin-top: 20px;
+            color: #D693A1;
+            font-size: 0.85rem;
+            display: none; /* 默认隐藏，在小屏幕上显示 */
+            font-family: 'Montserrat', sans-serif;
+            animation: pulse-opacity 2s infinite;
+        }
+        
+        @keyframes pulse-opacity {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
         }
         
         /* 新版轮播图样式 - 扩大尺寸并调整比例 */
@@ -630,7 +668,8 @@
         @media (min-width: 1600px) {
             /* 大屏幕优化 */
             .timeline {
-                width: 95%;
+                width: max-content;
+                min-width: 95%;
                 max-width: 1800px;
             }
             
@@ -655,7 +694,8 @@
         
         @media (max-width: 1400px) {
             .timeline {
-                width: 95%;
+                width: max-content;
+                min-width: 95%;
             }
             
             .timeline-item {
@@ -666,7 +706,8 @@
         
         @media (max-width: 1200px) {
             .timeline {
-                width: 95%;
+                width: max-content;
+                min-width: 95%;
             }
             
             .timeline-item {
@@ -742,7 +783,8 @@
             
             /* 修改响应式设计中时间轴相关样式 */
             .timeline {
-                width: 95%;
+                width: max-content;
+                min-width: 95%;
             }
             
             .timeline-item {
@@ -771,18 +813,14 @@
             .carousel-item.next {
                 transform: translateX(50%) scale(0.75);
             }
+            
+            /* 显示水平滚动提示 */
+            .scroll-indicator {
+                display: block;
+            }
         }
         
         @media (max-width: 768px) {
-            .timeline {
-                width: 95%;
-            }
-            
-            .timeline-item {
-                width: 230px;
-                margin-right: 12px;
-            }
-            
             .timeline-content {
                 padding: 18px;
             }
@@ -812,6 +850,49 @@
                 margin-bottom: 100px;
                 transform: translateY(-80px);
             }
+            
+            /* 优化边框在移动端的显示 */
+            .profile-image::before {
+                top: -8px;
+                left: -8px;
+                width: calc(100% + 16px);
+                height: calc(100% + 16px);
+                border-radius: 20px;
+            }
+            
+            .heart {
+                font-size: 26px; /* 缩小心形大小 */
+            }
+            
+            /* 在中等小屏幕上转为2x2网格布局 */
+            .timeline {
+                white-space: normal;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                width: 100%;
+                overflow: visible;
+            }
+            
+            .timeline::after {
+                display: none;
+            }
+            
+            .timeline-item {
+                width: calc(50% - 10px);
+                margin-right: 0;
+                margin-bottom: 20px;
+                display: block;
+            }
+            
+            .timeline-content::after {
+                display: none;
+            }
+            
+            /* 隐藏滚动提示 */
+            .scroll-indicator {
+                display: none;
+            }
         }
         
         @media (max-width: 576px) {
@@ -831,15 +912,11 @@
                 padding: 80px 0;
             }
             
-            /* 小屏幕优化 - 单行显示多个项目 */
-            .timeline {
-                width: 95%;
-            }
-            
+            /* 小屏幕进一步优化网格布局 */
             .timeline-item {
-                width: 200px;
-                margin-right: 10px;
-                padding: 8px 8px;
+                width: calc(50% - 8px);
+                padding: 6px;
+                margin-bottom: 16px;
             }
             
             .timeline-content {
@@ -877,19 +954,59 @@
                 margin-bottom: 80px;
                 transform: translateY(-50px);
             }
+            
+            /* 改进移动端的个人照片边框 */
+            .profile-image {
+                width: 50%; /* 增大图片在移动端的占比 */
+            }
+            
+            .profile-image::before {
+                top: -6px;
+                left: -6px;
+                width: calc(100% + 12px);
+                height: calc(100% + 12px);
+                border-radius: 18px;
+            }
+            
+            .profile-image img {
+                border-radius: 14px;
+                border-width: 3px;
+            }
+            
+            /* 优化心形在小屏幕上的位置 */
+            .heart:nth-of-type(1) {
+                top: -15px;
+                right: -10px;
+                font-size: 32px;
+            }
+            
+            .heart:nth-of-type(2) {
+                top: 20%;
+                right: -12px;
+                font-size: 30px;
+            }
+            
+            .heart:nth-of-type(3) {
+                bottom: 10%;
+                right: -8px;
+                font-size: 28px;
+            }
+            
+            .heart:nth-of-type(4) {
+                bottom: -10px;
+                left: 20%;
+                font-size: 26px;
+            }
+            
+            .heart:nth-of-type(5) {
+                top: 15%;
+                left: -12px;
+                font-size: 30px;
+            }
         }
         
         @media (max-width: 480px) {
             /* 超小屏幕优化 */
-            .timeline {
-                width: 95%;
-            }
-            
-            .timeline-item {
-                width: 180px;
-                margin-right: 8px;
-            }
-            
             .timeline-content {
                 padding: 12px;
             }
@@ -901,6 +1018,33 @@
             .hero-content {
                 margin-bottom: 60px;
                 transform: translateY(-30px);
+            }
+            
+            /* 进一步优化个人照片在超小屏幕的显示 */
+            .profile-image {
+                width: 60%;
+            }
+            
+            .profile-image::before {
+                top: -5px;
+                left: -5px;
+                width: calc(100% + 10px);
+                height: calc(100% + 10px);
+                border-radius: 16px;
+            }
+            
+            .profile-image img {
+                border-radius: 12px;
+                border-width: 2px;
+            }
+            
+            /* 调整心形图标尺寸 */
+            .heart {
+                font-size: 22px;
+            }
+            
+            .heart:nth-of-type(1) {
+                font-size: 28px;
             }
         }
     </style>
@@ -985,7 +1129,7 @@
                 </div>
                 <div class="timeline-item timeline-left">
                     <div class="timeline-content">
-                        <div class="timeline-date">2024年10月</div>
+                        <div class="timeline-date">2024年9月</div>
                         <h3 class="timeline-title">绝育手术</h3>
                         <img src="https://dzy-ym-duoduo.oss-cn-beijing.aliyuncs.com/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20250301165148.jpg" alt="绝育手术">
                     </div>
@@ -1147,11 +1291,34 @@
                 });
             });
             
+            // 添加触摸滑动支持
+            const carouselContainer = document.querySelector('.carousel-container');
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            carouselContainer.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            }, false);
+            
+            carouselContainer.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, false);
+            
+            function handleSwipe() {
+                if (touchEndX < touchStartX - 50) {
+                    // 左滑，下一张
+                    goToNext();
+                } else if (touchEndX > touchStartX + 50) {
+                    // 右滑，上一张
+                    goToPrev();
+                }
+            }
+            
             // 自动轮播
             let autoplayInterval = setInterval(goToNext, 5000);
             
             // 鼠标悬停时暂停自动轮播
-            const carouselContainer = document.querySelector('.carousel-container');
             carouselContainer.addEventListener('mouseenter', () => {
                 clearInterval(autoplayInterval);
             });
@@ -1162,6 +1329,23 @@
             
             // 初始化轮播图
             initCarousel();
+            
+            // 启用时间轴的触摸滑动
+            const timelineContainer = document.querySelector('.timeline-container');
+            
+            // 在移动端显示滚动提示3秒后消失
+            if (window.innerWidth <= 992) {
+                const scrollIndicator = document.querySelector('.scroll-indicator');
+                if (scrollIndicator) {
+                    scrollIndicator.style.display = 'block';
+                    setTimeout(() => {
+                        scrollIndicator.style.opacity = '0';
+                        setTimeout(() => {
+                            scrollIndicator.style.display = 'none';
+                        }, 1000);
+                    }, 3000);
+                }
+            }
         });
     </script>
 </body>
